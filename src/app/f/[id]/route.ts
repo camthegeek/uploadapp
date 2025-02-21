@@ -1,13 +1,17 @@
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { readdir } from "fs/promises"
 import { join } from "path"
 
 const UPLOAD_DIR = join(process.cwd(), "public", "uploads")
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest ) {
   try {
     const files = await readdir(UPLOAD_DIR)
-    const fileName = files.find((f) => f.startsWith(params.id))
+    const id = request.nextUrl.pathname.split("/").pop()
+    if (!id) {
+      return NextResponse.json({ error: "Invalid file id" }, { status: 400 })
+    }
+    const fileName = files.find((f) => f.startsWith(id))
 
     if (!fileName) {
       return NextResponse.json({ error: "File not found" }, { status: 404 })

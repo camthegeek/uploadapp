@@ -97,6 +97,21 @@ export function FileList() {
             <Button variant="ghost" size="icon" onClick={() => window.open(file.directUrl, "_blank")} title="Open file">
               <ExternalLink className="w-4 h-4" />
             </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => {
+                const a = document.createElement('a')
+                a.href = file.directUrl
+                a.download = file.name // Force download with original filename
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+              }} 
+              title="Download file"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </Button>
             <Button variant="ghost" size="icon" onClick={() => deleteFile(file.id)} title="Delete file">
               <Trash2 className="w-4 h-4" />
             </Button>

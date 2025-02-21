@@ -14,10 +14,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
-    // Generate unique filename
+    // Generate unique filename with proper extension handling
     const fileId = randomUUID()
-    const ext = file.name.split(".").pop()
-    const fileName = `${fileId}.${ext}`
+    const originalName = file.name
+    const extension = originalName.includes('.') 
+      ? originalName.substring(originalName.indexOf('.'))
+      : ''
+    const fileName = `${fileId}${extension}`
     const filePath = join(UPLOAD_DIR, fileName)
 
     // Convert File to Buffer
@@ -33,7 +36,7 @@ export async function POST(request: Request) {
       name: file.name,
       size: file.size,
       uploadedAt: new Date().toISOString(),
-      directUrl: `/uploads/${fileName}`,
+      directUrl: `/api/download/${fileId}`,
       maskedUrl: `/f/${fileId}`,
     }
 

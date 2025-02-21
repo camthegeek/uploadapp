@@ -1,14 +1,21 @@
-import { NextResponse } from "next/server"
-import { unlink } from "fs/promises"
+import { NextResponse, NextRequest } from "next/server"
+import { unlink, readdir } from "fs/promises"
 import { join } from "path"
-import { readdir } from "fs/promises"
 
 const UPLOAD_DIR = join(process.cwd(), "public", "uploads")
 
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+// delete is sent the file id as a parameter
+// delete the file from the server
+
+export async function DELETE(request: NextRequest) {
   try {
     const files = await readdir(UPLOAD_DIR)
-    const fileName = files.find((f) => f.startsWith(params.id))
+    const id = request.nextUrl.pathname.split("/").pop()
+    if (!id) {
+      return NextResponse.json({ error: "Invalid file id" }, { status: 400 })
+    }
+
+    const fileName = files.find((f) => f.startsWith(id))
 
     if (!fileName) {
       return NextResponse.json({ error: "File not found" }, { status: 404 })
@@ -22,7 +29,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Delete error:", error)
-    return NextResponse.json({ error: "Failed to delete file" }, { status: 500 })
+    return NextResponse.json({ error: `Failed to delete file` }, { status: 500 })
   }
 }
 
