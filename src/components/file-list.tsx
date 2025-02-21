@@ -88,10 +88,10 @@ export function FileList() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(file.directUrl)} title="Copy direct URL">
+            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(`${file.directUrl}`)} title="Copy direct URL">
               <ToggleLeft className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(file.maskedUrl)} title="Copy masked URL">
+            <Button variant="ghost" size="icon" onClick={() => copyToClipboard(`${file.maskedUrl}`)} title="Copy masked URL">
               <ToggleRight className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="icon" onClick={() => window.open(file.directUrl, "_blank")} title="Open file">

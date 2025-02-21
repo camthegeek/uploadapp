@@ -1,51 +1,32 @@
-import { NextResponse } from "next/server"
-import { writeFile } from "fs/promises"
-import { join } from "path"
-import { randomUUID } from "crypto"
-
-const UPLOAD_DIR = join(process.cwd(), "public", "uploads")
+import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+import { UPLOAD_DIR } from "@/config";
 
 export async function POST(request: Request) {
   try {
-    const formData = await request.formData()
-    const file = formData.get("file") as File
-
+    const formData = await request.formData();
+    const file = formData.get("file") as File;
+    
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 })
+      return NextResponse.json({ error: "No file received" }, { status: 400 });
     }
 
-    // Generate unique filename with proper extension handling
-    const fileId = randomUUID()
-    const originalName = file.name
-    const extension = originalName.includes('.') 
-      ? originalName.substring(originalName.indexOf('.'))
-      : ''
-    const fileName = `${fileId}${extension}`
-    const filePath = join(UPLOAD_DIR, fileName)
+    // Ensure upload directory exists
+    await mkdir(UPLOAD_DIR, { recursive: true });
 
-    // Convert File to Buffer
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Save file
-    await writeFile(filePath, buffer)
-
-    // Create file record
-    const fileInfo = {
-      id: fileId,
-      name: file.name,
-      size: file.size,
-      uploadedAt: new Date().toISOString(),
-      directUrl: `/api/download/${fileId}`,
-      maskedUrl: `/f/${fileId}`,
-    }
-
-    // In a real app, save fileInfo to a database here
-
-    return NextResponse.json(fileInfo)
-  } catch (error) {
-    console.error("Upload error:", error)
-    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 })
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    
+    const uniqueId = Date.now().toString();
+    const fileName = `${uniqueId}-${file.name}`;
+    const filePath = join(UPLOAD_DIR, fileName);
+    
+    await writeFile(filePath, buffer);
+    
+    return NextResponse.json({ fileId: uniqueId });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
   }
 }
-
