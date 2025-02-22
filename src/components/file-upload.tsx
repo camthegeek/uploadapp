@@ -7,7 +7,7 @@ import { Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { useUploadContext } from "@/context/upload-context"
-import { toast } from "sonner"
+import toast from 'react-hot-toast'
 
 export function FileUpload() {
   const [isDragging, setIsDragging] = useState(false)
@@ -65,7 +65,8 @@ export function FileUpload() {
           })
         }, 100)
 
-        await response.json()
+        await response.json();
+        console.log("Upload successful")
         toast.success(`Successfully uploaded ${file.name}`)
       } catch (error) {
         console.error("Upload error:", error)

@@ -3,9 +3,20 @@ import { readdir, stat } from "fs/promises"
 import { join } from "path"
 import { UPLOAD_DIR } from "@/config"
 
+async function readDirectory(dirPath: string): Promise<string[]> {
+  try {
+    return await readdir(dirPath)
+  } catch (error) {
+    console.error("Error reading files:", error)
+    return []
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const files = await readdir(UPLOAD_DIR)
+
+    const files = await readDirectory(UPLOAD_DIR)
+    console.log(files);
     const origin = request.headers.get("host") || ""
 
     const fileInfos = await Promise.all(

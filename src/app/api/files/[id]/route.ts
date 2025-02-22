@@ -1,8 +1,7 @@
 import { NextResponse, NextRequest } from "next/server"
 import { unlink, readdir } from "fs/promises"
 import { join } from "path"
-
-const UPLOAD_DIR = join(process.cwd(), "public", "uploads")
+import { UPLOAD_DIR } from "@/config"
 
 // delete is sent the file id as a parameter
 // delete the file from the server

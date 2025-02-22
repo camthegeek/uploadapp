@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { ExternalLink, FileIcon, Loader2, ToggleLeft, ToggleRight, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
+import toast from 'react-hot-toast'
 import { useUploadContext } from "@/context/upload-context"
 
 interface FileInfo {
@@ -13,12 +13,14 @@ interface FileInfo {
   uploadedAt: string
   directUrl: string
   maskedUrl: string
+  error?: string
 }
 
 export function FileList() {
   const [files, setFiles] = useState<FileInfo[]>([])
   const [loading, setLoading] = useState(true)
   const { refreshTrigger } = useUploadContext()
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchFiles()
@@ -34,7 +36,7 @@ export function FileList() {
       const data = await response.json()
       setFiles(data)
     } catch (error) {
-      console.error("Error fetching files:", error)
+      setError("Failed to fetch files")
       toast.error("Failed to fetch files")
     } finally {
       setLoading(false)
@@ -69,7 +71,10 @@ export function FileList() {
       </div>
     )
   }
-
+  if (error) {
+    return <div className="text-center p-8 text-red-500">{error}</div>
+  }
+  
   if (files.length === 0) {
     return <div className="text-center p-8 text-muted-foreground">No files uploaded yet</div>
   }
@@ -94,7 +99,7 @@ export function FileList() {
             <Button variant="ghost" size="icon" onClick={() => copyToClipboard(`${file.maskedUrl}`)} title="Copy masked URL">
               <ToggleRight className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={() => window.open(file.directUrl, "_blank")} title="Open file">
+            <Button variant="ghost" size="icon" onClick={() => window.open(file.maskedUrl, "_blank")} title="Open file">
               <ExternalLink className="w-4 h-4" />
             </Button>
             <Button 
