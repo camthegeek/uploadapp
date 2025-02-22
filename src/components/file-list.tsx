@@ -20,7 +20,6 @@ export function FileList() {
   const [files, setFiles] = useState<FileInfo[]>([])
   const [loading, setLoading] = useState(true)
   const { refreshTrigger } = useUploadContext()
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     fetchFiles()
@@ -36,8 +35,8 @@ export function FileList() {
       const data = await response.json()
       setFiles(data)
     } catch (error) {
-      setError("Failed to fetch files")
       toast.error("Failed to fetch files")
+      console.error("Error fetching files:", error)
     } finally {
       setLoading(false)
     }
@@ -70,9 +69,6 @@ export function FileList() {
         <Loader2 className="w-6 h-6 animate-spin" />
       </div>
     )
-  }
-  if (error) {
-    return <div className="text-center p-8 text-red-500">{error}</div>
   }
   
   if (files.length === 0) {
